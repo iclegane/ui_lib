@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { Modal } from "./ui/Modal"
-import { Drawer } from "./ui/Drawer"
+import { Modal } from "./ui/components/Modal"
+import { Drawer } from "./ui/components/Drawer"
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -20,7 +20,8 @@ function App() {
       <Modal title="Enter title" isOpen={isModalOpen} onClose={toggleModal} footer={<div>Footer content</div>} content={<div>
         <button onClick={toggleDrawer} type="button">Open Drawer</button>
       </div>} />
-      <Drawer isOpen={isDrawerOpen} onClose={toggleDrawer} content={<div>2</div>}/>
+        <button onClick={toggleDrawer} type="button">Open Drawer</button>
+      <Drawer isOpen={isDrawerOpen} onClose={toggleDrawer} content={<button onClick={toggleModal} type="button">Open Modal</button>}/>
   </div>
   )
 }

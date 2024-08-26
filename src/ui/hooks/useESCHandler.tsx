@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { getData, setData } from "../Modules/VisibleComponents";
+import {useCallback, useEffect} from "react";
+import {getData, setData} from "../Modules/VisibleComponents";
 
 type ESCHandlerType = {
     id: number;
@@ -8,32 +8,39 @@ type ESCHandlerType = {
 }
 
 export const useESCHandler = ({id, isOpen, onClose}: ESCHandlerType) => {
-    useEffect(() => {
-        const onPressKey = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                const data = getData()
 
-                const isClosble = Object.keys(data).reduce((_acc, item) => {
-                    if (Number(item) > id && data[item]) {
-                        return false
-                    } else {
-                        return true
-                    }
-                }, false);
-
-                if (isClosble) {
-                    onClose?.()
-                }
+    const handleKeyPress = useCallback((event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            if (!isOpen) {
+                return;
             }
+
+            const visibleComponents = getData();
+            const lastComponentId = visibleComponents[visibleComponents.length - 1];
+
+            if (lastComponentId === id) {
+                onClose?.();
+            }
+
+        }
+    }, [id, onClose]);
+
+    useEffect(() => {
+        if (isOpen) {
+            setData([...getData(), id]);
+        } else {
+            setData(getData().filter(componentId => componentId !== id));
         }
 
-        document.addEventListener('keydown', onPressKey)
-
-        return () => document.removeEventListener('keydown', onPressKey)
-    }, [onClose, isOpen, id])
+        return () => {
+            setData(getData().filter(componentId => componentId !== id));
+        };
+    }, [id, isOpen]);
 
 
     useEffect(() => {
-        setData({ [id]: isOpen })
-    }, [id, isOpen])
+        document.addEventListener('keydown', handleKeyPress)
+
+        return () => document.removeEventListener('keydown', handleKeyPress)
+    }, [handleKeyPress])
 }
