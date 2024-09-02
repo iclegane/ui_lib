@@ -1,46 +1,20 @@
-import {useCallback, useEffect} from "react";
-import {getData, setData} from "../Modules/VisibleComponents";
+import {useEffect, useRef} from "react";
+import {layerManager} from "../Modules/VisibleComponents";
 
 type ESCHandlerType = {
-    id: number;
     isOpen: boolean;
-    onClose?: VoidFunction;
+    onClose: void;
 }
 
-export const useESCHandler = ({id, isOpen, onClose}: ESCHandlerType) => {
-
-    const handleKeyPress = useCallback((event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-            if (!isOpen) {
-                return;
-            }
-
-            const visibleComponents = getData();
-            const lastComponentId = visibleComponents[visibleComponents.length - 1];
-
-            if (lastComponentId === id) {
-                onClose?.();
-            }
-
-        }
-    }, [id, onClose]);
+export const useESCHandler = ({isOpen, onClose}: ESCHandlerType) => {
+    const onCloseRef = useRef<void>()
+    onCloseRef.current = onClose;
 
     useEffect(() => {
-        if (isOpen) {
-            setData([...getData(), id]);
-        } else {
-            setData(getData().filter(componentId => componentId !== id));
+        if (!isOpen) {
+            return;
         }
 
-        return () => {
-            setData(getData().filter(componentId => componentId !== id));
-        };
-    }, [id, isOpen]);
-
-
-    useEffect(() => {
-        document.addEventListener('keydown', handleKeyPress)
-
-        return () => document.removeEventListener('keydown', handleKeyPress)
-    }, [handleKeyPress])
+        return layerManager.addLayer(onCloseRef.current)
+    }, [isOpen])
 }
