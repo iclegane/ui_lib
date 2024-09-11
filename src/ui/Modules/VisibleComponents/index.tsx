@@ -1,24 +1,24 @@
 class layerManagerClass {
-    private closeStack = void[]
+    private readonly closeStack: VoidFunction[] = [];
     constructor() {
         this.closeStack = [];
         this.init();
     }
 
-    public addLayer = (closeF: void) => {
-        this.closeStack.push(closeF)
-    }
+    public addLayer = (closeF: VoidFunction) => {
+        this.closeStack.push(closeF);
+    };
 
     private init = () => {
-        const  handleKeyPress = (event: KeyboardEvent) => {
+        const handleKeyPress = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 const closeF = this.closeStack.pop();
-                closeF();
+                closeF?.();
             }
-        }
+        };
 
-        document.addEventListener('keydown', handleKeyPress)
-    }
+        document.addEventListener('keydown', handleKeyPress);
+    };
 }
 
 export const layerManager = new layerManagerClass();
