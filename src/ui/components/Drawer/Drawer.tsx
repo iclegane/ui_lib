@@ -1,10 +1,9 @@
-import {React, Fragment, useState} from 'react'
+import {React, Fragment} from 'react'
 import { createPortal } from 'react-dom';
-import {getComponentId} from '../../Modules/VisibleComponents'
 import './style.css'
 import { getRootNode } from '../../utils/getRootNode.tsx';
-import { useESCHandler } from '../../hooks/useESCHandler.tsx';
-import {Transition} from "@headlessui/react";
+import {Transition, TransitionChild} from "@headlessui/react";
+import {useESCHandler} from "../../hooks/useESCHandler.tsx";
 
 const rootNode = getRootNode()
  
@@ -15,21 +14,15 @@ type DrawerType = {
 }
 
 export const Drawer: React.FC<DrawerType> = ({ isOpen, onClose, content }) => {
-    const [id] = useState(() => getComponentId())
-    useESCHandler({id, isOpen, onClose});
-
+    useESCHandler({isOpen, onClose});
     const onOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.stopPropagation();
         onClose?.();        
     }
 
-    if (!isOpen) {
-        return null
-    }
-
     return rootNode && createPortal(
         <Transition show={isOpen} appear={true}>
-            <Transition.Child
+            <TransitionChild
                 as={Fragment}
                 enter="ease-out duration-300"
                 enterFrom="opacity-0"
@@ -44,7 +37,7 @@ export const Drawer: React.FC<DrawerType> = ({ isOpen, onClose, content }) => {
                     {content}
                 </div>
             </div>
-            </Transition.Child>
+            </TransitionChild>
         </Transition>
         , rootNode
     );

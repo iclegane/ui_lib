@@ -1,15 +1,24 @@
-let modalId = 0;
-let visibleComponents: number[] = [];
- 
-export const getData = () => {
-    return visibleComponents;
+class layerManagerClass {
+    private closeStack = void[]
+    constructor() {
+        this.closeStack = [];
+        this.init();
+    }
+
+    public addLayer = (closeF: void) => {
+        this.closeStack.push(closeF)
+    }
+
+    private init = () => {
+        const  handleKeyPress = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                const closeF = this.closeStack.pop();
+                closeF();
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyPress)
+    }
 }
 
-export const setData = (newData: number[]) => {
-    visibleComponents = newData;
-}
-
-
-export const getComponentId = () => {
-    return modalId++;
-}
+export const layerManager = new layerManagerClass();

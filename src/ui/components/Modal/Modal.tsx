@@ -1,31 +1,24 @@
-import { ModalProps } from "./types.ts"
+import {ModalProps} from "./types.ts"
 import './style.css';
-import { createPortal } from 'react-dom';
-import React, {  useState, Fragment } from "react";
-import {  getComponentId } from '../../Modules/VisibleComponents'
-import { getRootNode } from "../../utils/getRootNode.tsx";
-import { useESCHandler } from "../../hooks/useESCHandler.tsx";
-import {Transition} from "@headlessui/react";
+import {createPortal} from 'react-dom';
+import React, {Fragment} from "react";
+import {getRootNode} from "../../utils/getRootNode.tsx";
+import {Transition, TransitionChild} from "@headlessui/react";
+import {useESCHandler} from "../../hooks/useESCHandler.tsx";
 
 const rootNode = getRootNode()
  
 export const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, content, footer }) => {
-    const [id] = useState(() => getComponentId());
-    useESCHandler({id, isOpen, onClose});
-
+    useESCHandler({isOpen, onClose});
     const onOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.stopPropagation();
         onClose?.();        
     }
 
-    if (!isOpen) {
-        return null
-    }
- 
     return rootNode && createPortal(
         (
         <Transition show={isOpen} appear={true}>
-            <Transition.Child
+            <TransitionChild
                 as={Fragment}
                 enter="ease-out duration-300"
                 enterFrom="opacity-0"
@@ -53,7 +46,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, content, f
                     </div>
                 </div>
             </div>
-            </Transition.Child>
+            </TransitionChild>
         </Transition>
         ), rootNode
     )
