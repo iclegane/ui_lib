@@ -12,9 +12,6 @@ const rootNode = getRootNode();
 
 export const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, content, footer }) => {
     useESCHandler({ isOpen, onClose });
-    const onOverlayClick = () => {
-        onClose();
-    };
 
     return (
         rootNode &&
@@ -30,7 +27,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, content, f
                     leaveTo="opacity-0"
                 >
                     <div className={'modal-container '}>
-                        <div onClick={onOverlayClick} className="modal-container__overlay" />
+                        <div onClick={onClose} className="modal-container__overlay" />
                         <div className="modal-container-content modal-container-content--centered">
                             <div className="modal-container-content__header">
                                 {title}

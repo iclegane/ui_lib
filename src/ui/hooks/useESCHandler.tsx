@@ -20,6 +20,8 @@ export const useESCHandler = ({ isOpen, onClose }: ESCHandlerType) => {
             onCloseRef.current();
         };
 
-        return layerManager.addLayer(handler);
+        const cleanUp = layerManager.addLayer(handler);
+
+        return cleanUp;
     }, [isOpen, onCloseRef]);
 };
