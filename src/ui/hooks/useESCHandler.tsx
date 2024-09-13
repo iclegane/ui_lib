@@ -1,20 +1,25 @@
-import {useEffect, useRef} from "react";
-import {layerManager} from "../Modules/VisibleComponents";
+import { useEffect } from 'react';
+
+import { useLatest } from './useLatest.ts';
+import { layerManager } from '../Modules/VisibleComponents';
 
 type ESCHandlerType = {
     isOpen: boolean;
-    onClose: void;
-}
+    onClose: VoidFunction;
+};
 
-export const useESCHandler = ({isOpen, onClose}: ESCHandlerType) => {
-    const onCloseRef = useRef<void>()
-    onCloseRef.current = onClose;
+export const useESCHandler = ({ isOpen, onClose }: ESCHandlerType) => {
+    const onCloseRef = useLatest<VoidFunction>(onClose);
 
     useEffect(() => {
         if (!isOpen) {
             return;
         }
 
-        return layerManager.addLayer(onCloseRef.current)
-    }, [isOpen])
-}
+        const handler = () => {
+            onCloseRef.current();
+        };
+
+        return layerManager.addLayer(handler);
+    }, [isOpen, onCloseRef]);
+};

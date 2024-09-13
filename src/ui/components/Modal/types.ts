@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 export type ModalProps = {
     isOpen: boolean;
@@ -6,4 +6,4 @@ export type ModalProps = {
     title?: string;
     footer?: ReactNode;
     content?: ReactNode;
-}
+};
