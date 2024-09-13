@@ -16,9 +16,6 @@ type DrawerType = {
 
 export const Drawer: React.FC<DrawerType> = ({ isOpen, onClose, content }) => {
     useESCHandler({ isOpen, onClose });
-    const onOverlayClick = () => {
-        onClose();
-    };
 
     return (
         rootNode &&
@@ -34,7 +31,7 @@ export const Drawer: React.FC<DrawerType> = ({ isOpen, onClose, content }) => {
                     leaveTo="opacity-0"
                 >
                     <div className="drawer-container">
-                        <div onClick={onOverlayClick} className="drawer__overlay"></div>
+                        <div onClick={onClose} className="drawer__overlay"></div>
                         <div className="drawer-container-content">{content}</div>
                     </div>
                 </TransitionChild>
