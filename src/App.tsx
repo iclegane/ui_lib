@@ -1,7 +1,9 @@
+import { Button } from '@headlessui/react';
 import { useState } from 'react';
 
 import { Drawer } from './ui/components/Drawer';
 import { Modal } from './ui/components/Modal';
+import { Popover } from './ui/components/Popover';
 
 function App() {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -40,6 +42,7 @@ function App() {
             <button onClick={toggleDrawer} type="button">
                 Open Drawer
             </button>
+
             <Drawer
                 isOpen={isDrawerOpen}
                 onClose={toggleDrawer}
@@ -49,6 +52,11 @@ function App() {
                     </button>
                 }
             />
+            <br />
+            <br />
+            <Popover content={<div>Popover content</div>}>
+                <Button>Open Popover</Button>
+            </Popover>
         </div>
     );
 }
