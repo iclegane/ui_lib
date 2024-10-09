@@ -1,5 +1,5 @@
 import { Transition, TransitionChild } from '@headlessui/react';
-import React, { useLayoutEffect, useRef, useState, useEffect, useCallback } from 'react';
+import React, { useLayoutEffect, useRef, useState, useEffect, useCallback, Fragment } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useLatest } from '../../hooks/useLatest.ts';
@@ -7,23 +7,36 @@ import { getRootNode } from '../../utils/getRootNode.tsx';
 
 type Props = {
     position?: 'left' | 'right' | 'top' | 'bottom';
-    content: React.ReactElement;
+    trigger: 'click' | 'hover';
+    content: React.ReactElement | string;
     children: React.ReactElement;
     closeOnClickOutside?: boolean;
 };
 const rootNode = getRootNode();
-const offset = 5;
+const offset = 15;
+const triggerMap = {
+    click: 'onClick',
+    hover: 'onMouseEnter',
+};
 
-export const Popover: React.FC<Props> = ({ content, position = 'top', children, closeOnClickOutside = true }) => {
+export const Popover: React.FC<Props> = ({
+    content,
+    position = 'top',
+    children,
+    closeOnClickOutside = true,
+    trigger = 'click',
+}) => {
     const [isOpen, setIsOpen] = useState(false);
+
     const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
+
     const targetRef = useRef<HTMLDivElement | null>(null);
     const popoverRef = useRef<HTMLDivElement | null>(null);
 
     const calculatePosition = useCallback(() => {
         if (!targetRef.current || !popoverRef.current) return;
+        const popoverRect = targetRef.current.getBoundingClientRect();
         const targetRect = targetRef.current.getBoundingClientRect();
-        const popoverRect = popoverRef.current.getBoundingClientRect();
 
         let top = 0;
         let left = 0;
@@ -53,19 +66,12 @@ export const Popover: React.FC<Props> = ({ content, position = 'top', children, 
     const isOpenRef = useLatest(isOpen);
     const closeOnClickOutsideRef = useLatest(closeOnClickOutside);
 
-    //todo: проверить на валидность компонента, строки и массивы
-    const clonedChildren = React.cloneElement(children, {
-        ref: targetRef,
-        onClick: () => setIsOpen((prev) => !prev),
-    });
-
-    useLayoutEffect(() => {
-        if (!isOpen) {
-            return;
-        }
-
-        calculatePosition();
-    }, [isOpen]);
+    const clonedChildren = !Array.isArray(children)
+        ? React.cloneElement(children, {
+              ref: targetRef,
+              [triggerMap[trigger]]: () => setIsOpen(true),
+          })
+        : null;
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -91,48 +97,56 @@ export const Popover: React.FC<Props> = ({ content, position = 'top', children, 
                 isOpen &&
                 createPortal(
                     <PopoverContent
+                        ref={popoverRef}
+                        onMount={calculatePosition}
                         isOpen={isOpen}
                         content={content}
                         position={popoverPosition}
-                        popoverRef={popoverRef}
                     />,
                     rootNode,
                 )}
         </>
     );
 };
-
-const PopoverContent: React.FC<{
+type PopoverContentProps = {
     isOpen: boolean;
-    content: React.ReactElement;
+    content: React.ReactElement | string;
     position: { top: number; left: number };
-    popoverRef: React.RefObject<HTMLDivElement>;
-}> = ({ isOpen, content, position, popoverRef }) => {
-    //todo: проверить на валидность компонента, строки и массивы
-    const clonedContent = React.cloneElement(content, {
-        ref: popoverRef,
-        style: {
-            position: 'absolute',
-            top: `${position.top}px`,
-            left: `${position.left}px`,
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            padding: '5px',
-        },
-    });
-
-    return (
-        <Transition show={isOpen} appear={true}>
-            <TransitionChild
-                enter="ease-out duration-500"
-                enterFrom="opacity-0"
-                enterTo="opacity-500"
-                leave="ease-in duration-1500"
-                leaveFrom="opacity-1500"
-                leaveTo="opacity-0"
-            >
-                {clonedContent}
-            </TransitionChild>
-        </Transition>
-    );
+    onMount?: VoidFunction;
 };
+
+const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+    ({ isOpen, position, content, onMount }, ref) => {
+        useLayoutEffect(() => {
+            onMount?.();
+        }, []);
+
+        return (
+            <Transition show={isOpen} appear={true}>
+                <TransitionChild
+                    as={Fragment}
+                    enter="ease-out duration-300000"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div
+                        ref={ref}
+                        style={{
+                            position: 'absolute',
+                            top: `${position.top}px`,
+                            left: `${position.left}px`,
+                            backgroundColor: 'white',
+                            border: '1px solid #ccc',
+                            padding: '5px',
+                        }}
+                    >
+                        {content}
+                    </div>
+                </TransitionChild>
+            </Transition>
+        );
+    },
+);

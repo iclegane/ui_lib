@@ -42,7 +42,6 @@ function App() {
             <button onClick={toggleDrawer} type="button">
                 Open Drawer
             </button>
-
             <Drawer
                 isOpen={isDrawerOpen}
                 onClose={toggleDrawer}
@@ -54,7 +53,7 @@ function App() {
             />
             <br />
             <br />
-            <Popover content={<div>Popover content</div>}>
+            <Popover trigger="click" content={'Popover content'}>
                 <Button>Open Popover</Button>
             </Popover>
         </div>
