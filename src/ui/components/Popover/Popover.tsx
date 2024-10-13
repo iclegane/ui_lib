@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect, useCallback, Fragment } from 'react
 import { createPortal } from 'react-dom';
 
 import { useLatest } from '../../hooks/useLatest.ts';
+import { debounce } from '../../utils/debounce.ts';
 import { getRootNode } from '../../utils/getRootNode.tsx';
 
 import { calculatePosition } from './utils';
@@ -16,6 +17,7 @@ type Props = {
 };
 const rootNode = getRootNode();
 const offset = 5;
+const resizeDelay = 300;
 const triggerMap = {
     click: 'onClick',
     hover: 'onMouseEnter',
@@ -38,7 +40,7 @@ export const Popover: React.FC<Props> = ({
     const isOpenRef = useLatest(isOpen);
     const closeOnClickOutsideRef = useLatest(closeOnClickOutside);
 
-    const beforeOpen = useCallback(() => {
+    const setPositions = useCallback(() => {
         if (!targetRef.current || !popoverRef.current) return;
 
         const { top, left } = calculatePosition(targetRef.current, popoverRef.current, {
@@ -48,6 +50,11 @@ export const Popover: React.FC<Props> = ({
 
         setPopoverPosition({ top, left });
     }, [position]);
+    const setPositionsRef = useLatest(setPositions);
+
+    const beforeOpen = () => {
+        setPositions();
+    };
 
     const getChildrenProps = useCallback(() => {
         const childProps = {
@@ -83,6 +90,18 @@ export const Popover: React.FC<Props> = ({
 
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setPositionsRef.current();
+        };
+
+        const debouncedResize = debounce(handleResize, resizeDelay);
+
+        window.addEventListener('resize', debouncedResize);
+
+        return () => window.removeEventListener('click', debouncedResize);
     }, []);
 
     return (
