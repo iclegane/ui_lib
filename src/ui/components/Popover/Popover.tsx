@@ -5,6 +5,8 @@ import { createPortal } from 'react-dom';
 import { useLatest } from '../../hooks/useLatest.ts';
 import { getRootNode } from '../../utils/getRootNode.tsx';
 
+import { calculatePosition } from './utils';
+
 type Props = {
     position?: 'left' | 'right' | 'top' | 'bottom';
     trigger: 'click' | 'hover';
@@ -13,7 +15,7 @@ type Props = {
     closeOnClickOutside?: boolean;
 };
 const rootNode = getRootNode();
-const offset = 15;
+const offset = 5;
 const triggerMap = {
     click: 'onClick',
     hover: 'onMouseEnter',
@@ -36,37 +38,18 @@ export const Popover: React.FC<Props> = ({
     const isOpenRef = useLatest(isOpen);
     const closeOnClickOutsideRef = useLatest(closeOnClickOutside);
 
-    const calculatePosition = useCallback(() => {
+    const beforeOpen = useCallback(() => {
         if (!targetRef.current || !popoverRef.current) return;
-        const popoverRect = targetRef.current.getBoundingClientRect();
-        const targetRect = targetRef.current.getBoundingClientRect();
 
-        let top = 0;
-        let left = 0;
-
-        switch (position) {
-            case 'top':
-                top = targetRect.top - popoverRect.height - offset;
-                left = targetRect.left + targetRect.width / 2 - popoverRect.width / 2;
-                break;
-            case 'bottom':
-                top = targetRect.bottom + offset;
-                left = targetRect.left + targetRect.width / 2 - popoverRect.width / 2;
-                break;
-            case 'left':
-                top = targetRect.top + targetRect.height / 2 - popoverRect.height / 2;
-                left = targetRect.left - popoverRect.width - offset;
-                break;
-            case 'right':
-                top = targetRect.top + targetRect.height / 2 - popoverRect.height / 2;
-                left = targetRect.right + offset;
-                break;
-        }
+        const { top, left } = calculatePosition(targetRef.current, popoverRef.current, {
+            position,
+            offset,
+        });
 
         setPopoverPosition({ top, left });
-    }, []);
+    }, [position]);
 
-    const setChildrenProps = useCallback(() => {
+    const getChildrenProps = useCallback(() => {
         const childProps = {
             [triggerMap[trigger]]: () => setIsOpen(true),
         };
@@ -81,7 +64,7 @@ export const Popover: React.FC<Props> = ({
     const clonedChildren = React.isValidElement(children)
         ? React.cloneElement(children as React.ReactElement, {
               ref: targetRef,
-              ...setChildrenProps(),
+              ...getChildrenProps(),
           })
         : null;
 
@@ -108,7 +91,7 @@ export const Popover: React.FC<Props> = ({
             {rootNode &&
                 createPortal(
                     <PopoverContent
-                        beforeEnter={calculatePosition}
+                        beforeOpen={beforeOpen}
                         ref={popoverRef}
                         isOpen={isOpen}
                         content={content}
@@ -123,11 +106,11 @@ type PopoverContentProps = {
     isOpen: boolean;
     content: React.ReactElement | string;
     position: { top: number; left: number };
-    beforeEnter?: VoidFunction;
+    beforeOpen?: VoidFunction;
 };
 
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-    ({ isOpen, position, content, beforeEnter }, ref) => {
+    ({ isOpen, position, content, beforeOpen }, ref) => {
         return (
             <Transition show={isOpen} appear={true}>
                 <TransitionChild
@@ -138,7 +121,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
                     leave="ease-in duration-200"
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
-                    beforeEnter={beforeEnter}
+                    beforeEnter={beforeOpen}
                 >
                     <div
                         ref={ref}
