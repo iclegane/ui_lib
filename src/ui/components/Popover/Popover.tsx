@@ -1,5 +1,5 @@
 import { Transition, TransitionChild } from '@headlessui/react';
-import React, { useLayoutEffect, useRef, useState, useEffect, useCallback, Fragment } from 'react';
+import React, { useRef, useState, useEffect, useCallback, Fragment } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useLatest } from '../../hooks/useLatest.ts';
@@ -33,6 +33,9 @@ export const Popover: React.FC<Props> = ({
     const targetRef = useRef<HTMLDivElement | null>(null);
     const popoverRef = useRef<HTMLDivElement | null>(null);
 
+    const isOpenRef = useLatest(isOpen);
+    const closeOnClickOutsideRef = useLatest(closeOnClickOutside);
+
     const calculatePosition = useCallback(() => {
         if (!targetRef.current || !popoverRef.current) return;
         const popoverRect = targetRef.current.getBoundingClientRect();
@@ -63,13 +66,22 @@ export const Popover: React.FC<Props> = ({
         setPopoverPosition({ top, left });
     }, []);
 
-    const isOpenRef = useLatest(isOpen);
-    const closeOnClickOutsideRef = useLatest(closeOnClickOutside);
+    const setChildrenProps = useCallback(() => {
+        const childProps = {
+            [triggerMap[trigger]]: () => setIsOpen(true),
+        };
 
-    const clonedChildren = !Array.isArray(children)
-        ? React.cloneElement(children, {
+        if (trigger === 'hover') {
+            childProps.onMouseLeave = () => setIsOpen(false);
+        }
+
+        return childProps;
+    }, [trigger]);
+
+    const clonedChildren = React.isValidElement(children)
+        ? React.cloneElement(children as React.ReactElement, {
               ref: targetRef,
-              [triggerMap[trigger]]: () => setIsOpen(true),
+              ...setChildrenProps(),
           })
         : null;
 
@@ -94,11 +106,10 @@ export const Popover: React.FC<Props> = ({
         <>
             {clonedChildren}
             {rootNode &&
-                isOpen &&
                 createPortal(
                     <PopoverContent
+                        beforeEnter={calculatePosition}
                         ref={popoverRef}
-                        onMount={calculatePosition}
                         isOpen={isOpen}
                         content={content}
                         position={popoverPosition}
@@ -112,15 +123,11 @@ type PopoverContentProps = {
     isOpen: boolean;
     content: React.ReactElement | string;
     position: { top: number; left: number };
-    onMount?: VoidFunction;
+    beforeEnter?: VoidFunction;
 };
 
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-    ({ isOpen, position, content, onMount }, ref) => {
-        useLayoutEffect(() => {
-            onMount?.();
-        }, []);
-
+    ({ isOpen, position, content, beforeEnter }, ref) => {
         return (
             <Transition show={isOpen} appear={true}>
                 <TransitionChild
@@ -131,6 +138,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
                     leave="ease-in duration-200"
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
+                    beforeEnter={beforeEnter}
                 >
                     <div
                         ref={ref}
