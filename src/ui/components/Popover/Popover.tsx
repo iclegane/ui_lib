@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useLatest } from '../../hooks/useLatest.ts';
 import { debounce } from '../../utils/debounce.ts';
 import { getRootNode } from '../../utils/getRootNode.tsx';
+import { isDefine } from '../../utils/isDefine.ts';
 
 import { calculatePosition } from './utils';
 
@@ -14,14 +15,12 @@ type Props = {
     content: React.ReactElement | string;
     children: React.ReactElement;
     closeOnClickOutside?: boolean;
+    visible?: boolean;
+    onVisibleChange?: (visible: boolean) => void;
 };
 const rootNode = getRootNode();
 const offset = 5;
 const resizeDelay = 300;
-const triggerMap = {
-    click: 'onClick',
-    hover: 'onMouseEnter',
-};
 
 export const Popover: React.FC<Props> = ({
     content,
@@ -29,14 +28,17 @@ export const Popover: React.FC<Props> = ({
     children,
     closeOnClickOutside = true,
     trigger = 'click',
+    visible,
+    onVisibleChange,
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isDefaultOpen, setIsDefaultOpen] = useState(false);
 
     const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
 
     const targetRef = useRef<HTMLDivElement | null>(null);
     const popoverRef = useRef<HTMLDivElement | null>(null);
 
+    const isOpen = isDefine(visible) ? visible : isDefaultOpen;
     const isOpenRef = useLatest(isOpen);
     const closeOnClickOutsideRef = useLatest(closeOnClickOutside);
 
@@ -56,13 +58,26 @@ export const Popover: React.FC<Props> = ({
         setPositions();
     };
 
+    const togglePopover = (state: boolean) => {
+        if (onVisibleChange) {
+            onVisibleChange(state);
+        } else {
+            setIsDefaultOpen(state);
+        }
+    };
+
     const getChildrenProps = useCallback(() => {
-        const childProps = {
-            [triggerMap[trigger]]: () => setIsOpen(true),
-        };
+        const childProps: {
+            onClick?: VoidFunction;
+            onMouseLeave?: VoidFunction;
+        } = {};
+
+        if (trigger === 'click') {
+            childProps.onClick = () => togglePopover(true);
+        }
 
         if (trigger === 'hover') {
-            childProps.onMouseLeave = () => setIsOpen(false);
+            childProps.onMouseLeave = () => togglePopover(false);
         }
 
         return childProps;
@@ -84,7 +99,7 @@ export const Popover: React.FC<Props> = ({
                 !popoverRef.current.contains(e.target as Node) &&
                 !targetRef.current?.contains(e.target as Node)
             ) {
-                setIsOpen(false);
+                isDefine(onVisibleChange) ? onVisibleChange(false) : setIsDefaultOpen(false);
             }
         };
 
@@ -121,6 +136,7 @@ export const Popover: React.FC<Props> = ({
         </>
     );
 };
+
 type PopoverContentProps = {
     isOpen: boolean;
     content: React.ReactElement | string;
