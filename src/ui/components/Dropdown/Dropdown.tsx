@@ -11,7 +11,6 @@ type DropdownComponents = {
     Trigger: typeof Trigger;
     Menu: typeof Menu;
     Item: typeof Item;
-    position?: PopoverProps['position'];
 };
 
 type DropdownProps = Pick<PopoverProps, 'position' | 'trigger'> & DefaultProps;
