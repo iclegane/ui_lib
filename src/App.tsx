@@ -54,18 +54,18 @@ function App() {
             />
             <br />
             <br />
-            <Popover trigger="click" content={'Popover content'}>
+            <Popover trigger="hover" content={'Popover content'}>
                 <Button>Open Popover</Button>
             </Popover>
 
-            <Dropdown>
+            <Dropdown trigger={'click'} position={'bottom'}>
                 <Dropdown.Trigger>
                     <button>Menu</button>
                 </Dropdown.Trigger>
                 <Dropdown.Menu>
                     <Dropdown.Item>Item 1</Dropdown.Item>
                     <Dropdown.Item>Item 2</Dropdown.Item>
-                    <Dropdown.Item>Item 3</Dropdown.Item>
+                    <Dropdown.Item isLink>Item 3</Dropdown.Item>
                     <Dropdown.Item>Item 4</Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>

@@ -14,4 +14,8 @@
     &:not(:last-child) {
         border-bottom: 1px solid #d3d3d33b;
     }
+
+    &.dropdown-item--link {
+        color: red
+    }
 }

@@ -9,7 +9,7 @@ import { isDefine } from '../../utils/isDefine.ts';
 
 import { calculatePosition } from './utils';
 
-type Props = {
+export type PopoverProps = {
     position?: 'left' | 'right' | 'top' | 'bottom';
     trigger: 'click' | 'hover';
     content: React.ReactElement | string;
@@ -22,7 +22,7 @@ const rootNode = getRootNode();
 const offset = 5;
 const resizeDelay = 300;
 
-export const Popover: React.FC<Props> = ({
+export const Popover: React.FC<PopoverProps> = ({
     content,
     position = 'top',
     children,
@@ -58,18 +58,22 @@ export const Popover: React.FC<Props> = ({
         setPositions();
     };
 
-    const togglePopover = (state: boolean) => {
-        if (onVisibleChange) {
-            onVisibleChange(state);
-        } else {
-            setIsDefaultOpen(state);
-        }
-    };
+    const togglePopover = useCallback(
+        (state: boolean) => {
+            if (onVisibleChange) {
+                onVisibleChange(state);
+            } else {
+                setIsDefaultOpen(state);
+            }
+        },
+        [onVisibleChange],
+    );
 
     const getChildrenProps = useCallback(() => {
         const childProps: {
             onClick?: VoidFunction;
             onMouseLeave?: VoidFunction;
+            onMouseEnter?: VoidFunction;
         } = {};
 
         if (trigger === 'click') {
@@ -77,6 +81,7 @@ export const Popover: React.FC<Props> = ({
         }
 
         if (trigger === 'hover') {
+            childProps.onMouseEnter = () => togglePopover(true);
             childProps.onMouseLeave = () => togglePopover(false);
         }
 
