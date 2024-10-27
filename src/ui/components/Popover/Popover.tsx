@@ -104,7 +104,7 @@ export const Popover: React.FC<PopoverProps> = ({
                 !popoverRef.current.contains(e.target as Node) &&
                 !targetRef.current?.contains(e.target as Node)
             ) {
-                isDefine(onVisibleChange) ? onVisibleChange(false) : setIsDefaultOpen(false);
+                togglePopover(false);
             }
         };
 
