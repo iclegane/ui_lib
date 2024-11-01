@@ -54,19 +54,27 @@ function App() {
             />
             <br />
             <br />
-            <Popover trigger="hover" content={'Popover content'}>
+            <Popover trigger="click" content={'Popover content'}>
                 <Button>Open Popover</Button>
             </Popover>
 
-            <Dropdown trigger={'click'} position={'bottom'}>
+            <Dropdown>
                 <Dropdown.Trigger>
                     <button>Menu</button>
                 </Dropdown.Trigger>
                 <Dropdown.Menu>
-                    <Dropdown.Item>Item 1</Dropdown.Item>
-                    <Dropdown.Item>Item 2</Dropdown.Item>
-                    <Dropdown.Item isLink>Item 3</Dropdown.Item>
-                    <Dropdown.Item>Item 4</Dropdown.Item>
+                    <Dropdown.Item>
+                        <button>Item 1</button>
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => console.log('Dropdown.Item.Click')}>
+                        <button>Item 2</button>
+                    </Dropdown.Item>
+                    <Dropdown.Item isLink>
+                        <button>Item 3</button>
+                    </Dropdown.Item>
+                    <Dropdown.Item>
+                        <button>Item 4</button>
+                    </Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>
         </div>

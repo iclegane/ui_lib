@@ -1,11 +1,10 @@
-import React, { useState, ReactElement, cloneElement, forwardRef } from 'react';
+import React, { useState, ReactElement } from 'react';
 
 import './styles.css';
-import { Popover, PopoverProps } from '../Popover';
-
-type DefaultProps = {
-    children: React.ReactNode;
-};
+import { BasePopover } from '../BasePopover';
+import { Item } from './Item.tsx';
+import { Menu } from './Menu.tsx';
+import { Trigger } from './Trigger.tsx';
 
 type DropdownComponents = {
     Trigger: typeof Trigger;
@@ -13,49 +12,45 @@ type DropdownComponents = {
     Item: typeof Item;
 };
 
-type DropdownProps = Pick<PopoverProps, 'position' | 'trigger'> & DefaultProps;
-
-type ItemProps = {
-    isLink?: boolean;
-} & DefaultProps;
-
-const Trigger = forwardRef<HTMLDivElement, DefaultProps>(({ children, ...props }, ref) => {
-    return React.isValidElement(children)
-        ? cloneElement(children as ReactElement, {
-              ref,
-              className: 'dropdown-trigger',
-              ...props,
-          })
-        : null;
-});
-
-const Menu: React.FC<DefaultProps> = ({ children }) => <div className="dropdown-menu">{children}</div>;
-
-const Item: React.FC<ItemProps> = ({ children, isLink }) => (
-    <div className={`dropdown-item ${isLink ? 'dropdown-item--link' : null}`}>{children}</div>
-);
+type DropdownProps = {
+    children: React.ReactNode;
+};
 
 export const Dropdown: React.FC<DropdownProps> & DropdownComponents = ({ children, ...props }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    const triggerElement = React.Children.toArray(children).find(
-        (child) => React.isValidElement(child) && child.type === Trigger,
-    );
-    const menuElement = React.Children.toArray(children).find(
-        (child) => React.isValidElement(child) && child.type === Menu,
+    const { triggerElement, menuElement } = React.Children.toArray(children).reduce<{
+        triggerElement: null | ReactElement;
+        menuElement: null | ReactElement;
+    }>(
+        (acc, child) => {
+            if (React.isValidElement(child)) {
+                if (child.type === Trigger) {
+                    acc.triggerElement = child;
+                } else if (child.type === Menu) {
+                    acc.menuElement = React.cloneElement(child as React.ReactElement, {
+                        onItemClick: () => setIsOpen(false),
+                    });
+                }
+            }
+            return acc;
+        },
+        { triggerElement: null, menuElement: null },
     );
 
     return (
         <div className="dropdown">
             {React.isValidElement(triggerElement) && React.isValidElement(menuElement) && (
-                <Popover
+                <BasePopover
+                    trigger={'click'}
+                    position={'bottom'}
                     content={menuElement}
-                    visible={isOpen}
-                    onVisibleChange={(state) => setIsOpen(state)}
+                    isOpen={isOpen}
+                    onClose={setIsOpen}
                     {...props}
                 >
                     {triggerElement}
-                </Popover>
+                </BasePopover>
             )}
         </div>
     );
