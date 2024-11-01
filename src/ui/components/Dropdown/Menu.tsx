@@ -5,11 +5,11 @@ import { isDefine } from '../../utils/isDefine.ts';
 import { Item } from './Item.tsx';
 
 type MenuProps = {
-    onItemClick?: VoidFunction;
+    close?: VoidFunction;
     children: React.ReactNode;
 };
 
-export const Menu: React.FC<MenuProps> = ({ children, onItemClick }) => {
+export const Menu: React.FC<MenuProps> = ({ children, close }) => {
     return (
         <div className="dropdown-menu">
             {React.Children.map(children, (child) => {
@@ -18,7 +18,7 @@ export const Menu: React.FC<MenuProps> = ({ children, onItemClick }) => {
                         onClick: () => {
                             if (isDefine(child.props.onClick)) {
                                 child.props.onClick?.();
-                                onItemClick?.();
+                                close?.();
                             }
                         },
                     });
