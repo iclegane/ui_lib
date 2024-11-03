@@ -1,0 +1,21 @@
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    gap:5px;
+}
+
+.dropdown-item {
+    display: block;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid #d3d3d33b;
+    }
+
+    &.dropdown-item--link {
+        color: red
+    }
+}

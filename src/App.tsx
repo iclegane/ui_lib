@@ -2,6 +2,7 @@ import { Button } from '@headlessui/react';
 import { useState } from 'react';
 
 import { Drawer } from './ui/components/Drawer';
+import { Dropdown } from './ui/components/Dropdown';
 import { Modal } from './ui/components/Modal';
 import { Popover } from './ui/components/Popover';
 
@@ -56,6 +57,26 @@ function App() {
             <Popover trigger="click" content={'Popover content'}>
                 <Button>Open Popover</Button>
             </Popover>
+
+            <Dropdown>
+                <Dropdown.Trigger>
+                    <button>Menu</button>
+                </Dropdown.Trigger>
+                <Dropdown.Menu>
+                    <Dropdown.Item>
+                        <button>Item 1</button>
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => console.log('Dropdown.Item.Click')}>
+                        <button>Item 2</button>
+                    </Dropdown.Item>
+                    <Dropdown.Item isLink>
+                        <button>Item 3</button>
+                    </Dropdown.Item>
+                    <Dropdown.Item>
+                        <button>Item 4</button>
+                    </Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
         </div>
     );
 }
