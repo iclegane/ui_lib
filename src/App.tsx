@@ -1,10 +1,12 @@
 import { Button } from '@headlessui/react';
 import { useState } from 'react';
 
+import { ApiLoadOptions, CitySelectItems } from './ui/Api';
 import { Drawer } from './ui/components/Drawer';
 import { Dropdown } from './ui/components/Dropdown';
 import { Modal } from './ui/components/Modal';
 import { Popover } from './ui/components/Popover';
+import { Select } from './ui/components/Select';
 
 function App() {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -52,31 +54,71 @@ function App() {
                     </button>
                 }
             />
-            <br />
-            <br />
-            <Popover trigger="click" content={'Popover content'}>
-                <Button>Open Popover</Button>
-            </Popover>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 24,
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                }}
+            >
+                <Popover trigger="click" content={'Popover content'}>
+                    <Button>Open Popover</Button>
+                </Popover>
 
-            <Dropdown>
-                <Dropdown.Trigger>
-                    <button>Menu</button>
-                </Dropdown.Trigger>
-                <Dropdown.Menu>
-                    <Dropdown.Item>
-                        <button>Item 1</button>
-                    </Dropdown.Item>
-                    <Dropdown.Item onClick={() => console.log('Dropdown.Item.Click')}>
-                        <button>Item 2</button>
-                    </Dropdown.Item>
-                    <Dropdown.Item isLink>
-                        <button>Item 3</button>
-                    </Dropdown.Item>
-                    <Dropdown.Item>
-                        <button>Item 4</button>
-                    </Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>
+                <Dropdown>
+                    <Dropdown.Trigger>
+                        <button>Menu</button>
+                    </Dropdown.Trigger>
+                    <Dropdown.Menu>
+                        <Dropdown.Item>
+                            <button>Item 1</button>
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => console.log('Dropdown.Item.Click')}>
+                            <button>Item 2</button>
+                        </Dropdown.Item>
+                        <Dropdown.Item isLink>
+                            <button>Item 3</button>
+                        </Dropdown.Item>
+                        <Dropdown.Item>
+                            <button>Item 4</button>
+                        </Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+
+                <Select<CitySelectItems>
+                    isAsync={true}
+                    loadOptions={ApiLoadOptions}
+                    mapToSelectOptions={(response) => {
+                        const res = response?.cities ?? [];
+                        return res.map(({ id, code, description }) => ({
+                            id,
+                            label: `${code}-${description}`,
+                        }));
+                    }}
+                />
+
+                <Select
+                    isAsync={false}
+                    value={2}
+                    onChange={(option) => console.log(option)}
+                    options={[
+                        {
+                            id: 0,
+                            label: 'Item 1',
+                        },
+                        {
+                            id: 1,
+                            label: 'Item 2',
+                        },
+                        {
+                            id: 2,
+                            label: 'Item 3',
+                        },
+                    ]}
+                />
+            </div>
         </div>
     );
 }

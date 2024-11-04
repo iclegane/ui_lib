@@ -46,7 +46,7 @@ export const Dropdown: React.FC<DropdownProps> & DropdownComponents = ({ childre
                     position={'bottom'}
                     content={menuElement}
                     isOpen={isOpen}
-                    onClose={setIsOpen}
+                    onOpenChange={setIsOpen}
                     {...props}
                 >
                     {triggerElement}

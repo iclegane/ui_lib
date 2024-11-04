@@ -15,10 +15,10 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
         return (
             <Transition
                 show={isOpen}
-                enter="transition-opacity ease-out duration-1000"
+                enter="transition-opacity ease-out duration-150"
                 enterFrom="opacity-0"
                 enterTo="opacity-100"
-                leave="transition-opacity ease-in duration-300"
+                leave="transition-opacity ease-in duration-150"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
                 appear={true}

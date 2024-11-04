@@ -1,0 +1,19 @@
+ .select-menu-list {
+    display: flex;
+    flex-direction: column;
+    width: 150px;
+    align-content: flex-start;
+
+     .select-menu-item {
+         &.select-menu-item--active {
+             background: #f6f6ff;
+         }
+         &:hover {
+             background: #f6f6ff;
+         }
+
+         button {
+             width: fit-content;
+         }
+     }
+}
