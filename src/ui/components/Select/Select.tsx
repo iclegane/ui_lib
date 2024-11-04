@@ -10,9 +10,10 @@ import { SelectList } from './SelectList.tsx';
 export type SelectOption = {
     id: number;
     label: string;
+    disabled?: boolean;
 };
 type BaseSelect = {
-    value?: number;
+    value?: number | null;
     options?: SelectOption[];
     onChange?: (option: SelectOption | null) => void;
     optionRender?: (option: SelectOption) => React.ReactNode;
@@ -77,9 +78,9 @@ export const Select = <T = unknown,>({
     }, [isAsync]);
 
     const onSelectHandler = (option: SelectOption) => {
+        setIsOpen(false);
         setSelectValue((prev) => (prev?.id === option.id ? null : option));
         setInputValue(null);
-        setIsOpen(false);
 
         onChange?.(selectValue);
     };
@@ -91,7 +92,7 @@ export const Select = <T = unknown,>({
         onChange?.(null);
     };
 
-    const inputDisplayText = inputValue ?? selectValue?.label ?? '';
+    const displayInputText = inputValue ?? selectValue?.label ?? '';
 
     const filteredOptions = inputValue
         ? options.filter((option) => option.label.toLowerCase().includes(inputValue.toLowerCase()))
@@ -119,8 +120,11 @@ export const Select = <T = unknown,>({
             }}
         >
             <Input
-                value={inputDisplayText}
-                onSearch={(text) => setInputValue(text)}
+                value={displayInputText}
+                onSearch={(text) => {
+                    setInputValue(text);
+                    !isOpen && setIsOpen(true);
+                }}
                 onReset={onResetHandler}
                 placeholder="Значение"
                 type="text"

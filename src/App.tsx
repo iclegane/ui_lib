@@ -20,6 +20,8 @@ function App() {
         setIsDrawerOpen((prev) => !prev);
     };
 
+    const [selectValue, setSelectValue] = useState<number | null>();
+
     return (
         <div className="container mx-auto">
             <button
@@ -95,14 +97,15 @@ function App() {
                         return res.map(({ id, code, description }) => ({
                             id,
                             label: `${code}-${description}`,
+                            disabled: id === 2,
                         }));
                     }}
                 />
 
                 <Select
                     isAsync={false}
-                    value={2}
-                    onChange={(option) => console.log(option)}
+                    value={selectValue}
+                    onChange={(option) => setSelectValue(option?.id)}
                     options={[
                         {
                             id: 0,
@@ -111,10 +114,15 @@ function App() {
                         {
                             id: 1,
                             label: 'Item 2',
+                            disabled: true,
                         },
                         {
                             id: 2,
                             label: 'Item 3',
+                        },
+                        {
+                            id: 3,
+                            label: 'Item 4',
                         },
                     ]}
                 />

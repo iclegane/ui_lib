@@ -1,6 +1,8 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
+import { isDefine } from '../../utils/isDefine.ts';
+
 import { SelectOption } from './Select.tsx';
 
 type SelectListProps = {
@@ -22,6 +24,7 @@ export const SelectList: React.FC<SelectListProps> = ({
         <div className="select-menu-list">
             {!isLoading &&
                 options.map((option) => {
+                    const isDisabled = isDefine(option?.disabled) && option.disabled;
                     const isActive = currentOption?.id === option.id;
                     return (
                         <SelectListItem
@@ -30,6 +33,7 @@ export const SelectList: React.FC<SelectListProps> = ({
                             option={option}
                             onSelect={onSelect}
                             isActive={isActive}
+                            isDisabled={isDisabled}
                         />
                     );
                 })}
@@ -42,24 +46,35 @@ export const SelectList: React.FC<SelectListProps> = ({
 type SelectListItemProps = {
     option: SelectOption;
     isActive: boolean;
+    isDisabled: boolean;
     onSelect: (item: SelectOption) => void;
     optionRender?: (option: SelectOption) => ReactNode;
 };
 
-const SelectListItem: React.FC<SelectListItemProps> = ({ isActive, option, optionRender, onSelect }) => {
+const SelectListItem: React.FC<SelectListItemProps> = ({ isActive, isDisabled, option, optionRender, onSelect }) => {
     if (optionRender) {
         const element = optionRender(option);
         if (React.isValidElement(element)) {
             return React.cloneElement(element as React.ReactElement, {
                 onClick: () => onSelect(option),
-                className: classNames(element.props.className, { 'select-menu-item--active': isActive }),
+                className: classNames(element.props.className, {
+                    'select-menu-item--active': isActive,
+                    'select-menu-item--disabled': isDisabled,
+                }),
             });
         }
     }
 
+    const className = classNames('select-menu-item', {
+        'select-menu-item--active': isActive,
+        'select-menu-item--disabled': isDisabled,
+    });
+
     return (
-        <div className={`select-menu-item ${isActive && 'select-menu-item--active'}`}>
-            <button onClick={() => onSelect(option)}>{option.label}</button>
+        <div className={className}>
+            <button disabled={isDisabled} onClick={() => onSelect(option)}>
+                {option.label}
+            </button>
         </div>
     );
 };
