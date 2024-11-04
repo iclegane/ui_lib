@@ -1,0 +1,28 @@
+.select-menu-list {
+    display: flex;
+    flex-direction: column;
+    width: 150px;
+    align-items: flex-start;
+
+    .select-menu-item {
+        width: 100%;
+        &.select-menu-item--active {
+            background: #f6f6ff;
+        }
+        &.select-menu-item--disabled {
+            background: #d5d5d52e;
+
+            & > * {
+                color: #67676742;
+                cursor: no-drop;
+            }
+        }
+        &:hover:not(.select-menu-item--disabled) {
+            background: #e1e1ff;
+        }
+        button {
+            width: 100%;
+            text-align: start;
+        }
+    }
+}

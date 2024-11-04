@@ -1,0 +1,31 @@
+.inputWrapper {
+    position: relative;
+    display: flex;
+    width: fit-content;
+
+    input {
+        border: 1px solid #bfbfbf4d;
+        border-radius: 7px;
+        padding: 2px 4px;
+
+        &:focus-visible {
+            outline: none;
+            border-color: cornflowerblue;
+        }
+    }
+
+    button {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+}
+
+.inputWrapperButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 25px;
+    height: 25px;
+}

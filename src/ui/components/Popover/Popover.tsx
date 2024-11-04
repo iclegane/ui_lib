@@ -26,7 +26,7 @@ export const Popover: React.FC<PopoverProps> = ({
             closeOnClickOutside={closeOnClickOutside}
             content={content}
             isOpen={isOpen}
-            onClose={setIsOpen}
+            onOpenChange={setIsOpen}
         >
             {children}
         </BasePopover>

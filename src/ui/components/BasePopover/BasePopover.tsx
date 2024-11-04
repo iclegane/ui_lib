@@ -10,12 +10,12 @@ import { calculatePosition } from '../Popover/utils';
 
 export type BasePopoverProps = {
     position: 'left' | 'right' | 'top' | 'bottom';
-    trigger: 'click' | 'hover';
+    trigger: 'click' | 'hover' | 'focus';
     content: React.ReactElement | string;
     closeOnClickOutside?: boolean;
     children: React.ReactElement;
     isOpen: boolean;
-    onClose: (isOpenState: boolean) => void;
+    onOpenChange: (isOpenState: boolean) => void;
 };
 const rootNode = getRootNode();
 const offset = 5;
@@ -23,7 +23,7 @@ const resizeDelay = 300;
 
 export const BasePopover: React.FC<BasePopoverProps> = ({
     isOpen,
-    onClose,
+    onOpenChange,
     closeOnClickOutside = true,
     content,
     position,
@@ -51,7 +51,7 @@ export const BasePopover: React.FC<BasePopoverProps> = ({
     const setPositionsRef = useLatest(setPositions);
 
     const togglePopover = (isOpen: boolean) => {
-        onClose(isOpen);
+        onOpenChange(isOpen);
     };
 
     const beforeOpen = () => {
@@ -61,12 +61,19 @@ export const BasePopover: React.FC<BasePopoverProps> = ({
     const getChildrenProps = useCallback(() => {
         const childProps: {
             onClick?: VoidFunction;
+            onFocus?: VoidFunction;
+            onBlur?: VoidFunction;
             onMouseLeave?: VoidFunction;
             onMouseEnter?: VoidFunction;
         } = {};
 
         if (trigger === 'click') {
             childProps.onClick = () => togglePopover(true);
+        }
+
+        if (trigger === 'focus') {
+            childProps.onFocus = () => togglePopover(true);
+            //childProps.onBlur = () => togglePopover(false);
         }
 
         if (trigger === 'hover') {
